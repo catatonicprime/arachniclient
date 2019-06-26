@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+
+import argparse
+from arachniclient import *
+
+parser = argparse.ArgumentParser(description='Schedule an arachni scan using an arachni REST server.')
+parser.add_argument('--hostname', type=str, nargs=1, help='hostname of the arachni REST server (default: localhost)')
+parser.add_argument('--port', type=str, nargs=1, help='port of the arachni REST server (default: localhost)')
+parser.add_argument('--username', type=int, nargs=1, help='username to authenticate to the REST server with')
+parser.add_argument('--password', type=int, nargs=1, help='password to authenticate to the REST server with')
+parser.add_argument('--url', type=str, nargs=1, help='URL to scan')
+parser.add_argument('--delete', type=str, nargs=1, help='delete/abandon a scan on the arachni REST server')
+parser.add_argument('--report', type=str, nargs=1, help='download report from the arachni REST server')
+parser.add_argument('--format', type=str, nargs=1, help='downloaded report format')
+parser.add_argument('--list', action='store_true', help='list scan ids from the arachni REST server')
+parser.add_argument('--status', type=str, nargs=1, help='get status of scan from the arachni REST server')
+parser.add_argument('--pause', type=str, nargs=1, help='pause scan running on the arachni REST server')
+
+args = parser.parse_args()
+
+client = Client()
+if args.hostname:
+    client.hostname = args.hostname
+if args.port:
+    client.port = args.port
+if args.username:
+    client.username = args.username
+if args.password:
+    client.password = args.password
+
+if args.url:
+    url = args.url[0]
+    scan = Scan(client=client, scanOptions=
+    {
+        "url" : url,
+        "audit": {
+            'elements': ['link', 'form']
+        },
+        "checks" : ['active/*']
+        }
+    )
+    scan.startScan()
+    print("Scan started, new scan id: {0}".format(scan.id))
+
+if args.report:
+    print (args.report[0])
+    scan = Scan(client=client, _id=args.report[0])
+    if args.format:
+        print ("Downloading report with format: {0}".format(args.format[0]))
+    scan.downloadReport(_format=args.format[0])
+
+if args.list:
+    print ("Listing scans...")
+    scans = client.getScans()
+    for scan in scans:
+        scan.display()
+
+if args.delete:
+    scan = Scan(client=client, _id=args.delete[0])
+    scan.deleteScan()
+if args.status:
+    scan = Scan(client=client, _id=args.status[0])
+    scan.display()
+if args.pause:
+    scan = Scan(client=client, _id=args.pause[0])
+    scan.pauseScan()
