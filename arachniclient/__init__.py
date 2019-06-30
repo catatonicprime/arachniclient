@@ -96,10 +96,7 @@ class Client:
             return HTTPBasicAuth(self.username, self.password)
         return None
 
-    def getUrl(self):
-        return 'http://{0}:{1}/'.format(self.hostname, self.port)
-
-    def getUrl(self, endpoint):
+    def getUrl(self, endpoint=''):
         return 'http://{0}:{1}/{2}'.format(self.hostname, self.port, endpoint)
 
     def getScans(self):
