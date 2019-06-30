@@ -36,7 +36,7 @@ class Scan:
         if self.client is None:
             raise Exception("client cannot be None")
         if self.id is None:
-            self.startScan(self)
+            self.startScan()
         else:
             self.client.resumeScan(self.id)
 
