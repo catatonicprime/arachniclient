@@ -20,13 +20,13 @@ args = parser.parse_args()
 
 client = Client()
 if args.hostname:
-    client.hostname = args.hostname
+    client.hostname = args.hostname[0]
 if args.port:
-    client.port = args.port
+    client.port = args.port[0]
 if args.username:
-    client.username = args.username
+    client.username = args.username[0]
 if args.password:
-    client.password = args.password
+    client.password = args.password[0]
 
 if args.url:
     url = args.url[0]
@@ -60,6 +60,7 @@ if args.delete:
     scan.deleteScan()
 if args.status:
     scan = Scan(client=client, _id=args.status[0])
+    scan.updateScan()
     scan.display()
 if args.pause:
     scan = Scan(client=client, _id=args.pause[0])
