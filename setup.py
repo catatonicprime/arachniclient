@@ -7,6 +7,9 @@ setuptools.setup(
         name = 'arachniclient',
         version = '0.1',
         scripts = ['arachni-client'],
+        install_requires=[
+            'requests'
+        ],
         author = 'catatonicprime',
         author_email = 'catatonicprime@gmail.com',
         description = 'REST API client for arachni.',
