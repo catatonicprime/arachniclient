@@ -1,4 +1,3 @@
-import json
 import requests
 from requests.auth import HTTPBasicAuth
 from io import StringIO
@@ -101,7 +100,7 @@ class Client:
 
     def getScans(self):
         r = requests.get(self.getUrl('scans'), auth=self.getAuth())
-        scanIds = json.load(StringIO(r.content.decode("utf-8")))
+        scanIds = r.json()
         scans = []
         for _id in scanIds:
             scans.append(Scan(_id=_id, scan=self.getScan(_id), client=self))
@@ -111,14 +110,17 @@ class Client:
         r = requests.post(self.getUrl('scans'), json=scanOptions, auth=self.getAuth())
         if not r.status_code == 200:
             raise Exception('An error occurred: \r\n{0}'.format(r.content))
-        scan_id = json.load(StringIO(r.content.decode("utf-8")))['id']
+        try:
+            scan_id = r.json()['id']
+        except:
+            raise Exception('An error occurred retreiving scan id from json: {0}'.format(r.content))
         return scan_id
 
     def getScan(self, _id):
         r = requests.get(self.getUrl('scans/{0}'.format(_id)), auth=self.getAuth())
         if not r.status_code == 200:
             raise Exception('An error occurred: \r\n{0}'.format(r.content))
-        return json.load(StringIO(r.content.decode("utf-8")))
+        return r.json()
 
     def pauseScan(self, _id):
         r = requests.put(self.getUrl('scans/{0}/pause'.format(_id)), auth=self.getAuth())
