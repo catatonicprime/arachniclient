@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
         name = 'arachniclient',
-        version = '0.1',
+        version = '0.2',
         scripts = ['arachni-client'],
         install_requires=[
             'requests'
