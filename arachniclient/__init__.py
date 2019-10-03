@@ -79,13 +79,16 @@ class Scan:
 class Client:
     def __init__(self, hostname='localhost', port='7331', username=None, password=None):
         if hostname is None:
-            raise Exception('Hostname cannot be None')
+            raise Exception('hostname cannot be None')
         if port is None:
-            raise Exception('Port cannot be None')
+            raise Exception('port cannot be None')
         self.hostname = hostname
         self.port = port
-        self.username = username
-        self.password = password
+        # Build the clients requests session with auth etc.
+        session = requests.Session()
+        if not (username is None or password is None):
+            session.auth = HTTPBasicAuth(username, password)
+        self._session = session
 
     def getAuth(self):
         if not (self.username is None or self.password is None):
@@ -96,7 +99,7 @@ class Client:
         return 'http://{0}:{1}/{2}'.format(self.hostname, self.port, endpoint)
 
     def getScans(self):
-        r = requests.get(self.getUrl('scans'), auth=self.getAuth())
+        r = self._session.get(self.getUrl('scans'))
         scanIds = r.json()
         scans = []
         for _id in scanIds:
@@ -104,7 +107,7 @@ class Client:
         return scans
 
     def addScan(self, scanOptions):
-        r = requests.post(self.getUrl('scans'), json=scanOptions, auth=self.getAuth())
+        r = self._session.post(self.getUrl('scans'), json=scanOptions)
         if not r.status_code == 200:
             raise Exception('An error occurred: \r\n{0}'.format(r.content))
         try:
@@ -114,23 +117,23 @@ class Client:
         return scan_id
 
     def getScan(self, _id):
-        r = requests.get(self.getUrl('scans/{0}'.format(_id)), auth=self.getAuth())
+        r = self._session.get(self.getUrl('scans/{0}'.format(_id)))
         if not r.status_code == 200:
             raise Exception('An error occurred: \r\n{0}'.format(r.content))
         return r.json()
 
     def pauseScan(self, _id):
-        r = requests.put(self.getUrl('scans/{0}/pause'.format(_id)), auth=self.getAuth())
+        r = self._session.put(self.getUrl('scans/{0}/pause'.format(_id)))
         if not r.status_code == 200:
             raise Exception('Failed to pause scan with id {0}'.format(_id))
 
     def resumeScan(self, _id):
-        r = requests.put(self.getUrl('scans/{0}/resume'.format(_id)), auth=self.getAuth())
+        r = self._session.put(self.getUrl('scans/{0}/resume'.format(_id)))
         if not r.status_code == 200:
             raise Exception('Failed to resume scan with id {0}'.format(_id))
 
     def deleteScan(self, _id):
-        r = requests.delete(self.getUrl('scans/{0}'.format(_id)), auth=self.getAuth())
+        r = self._session.delete(self.getUrl('scans/{0}'.format(_id)))
         if not r.status_code == 200:
             raise Exception('Failed to delete scan with id {0}'.format(_id))
 
@@ -138,7 +141,7 @@ class Client:
         url = self.getUrl('scans/{0}/report'.format(_id))
         if _format in ['json', 'xml', 'yaml', 'html.zip']:
             url = "{0}.{1}".format(url, 'html.zip')
-        r = requests.get(url, auth=self.getAuth())
+        r = self._session.get(url)
         if not r.status_code == 200:
             raise Exception('Failed to download report for scan id {0}'.format(_id))
         return r.content
