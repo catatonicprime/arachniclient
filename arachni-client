@@ -1,67 +1,72 @@
 #!/usr/bin/env python
 
 import argparse
+import json
 from arachniclient import *
 
 parser = argparse.ArgumentParser(description='Schedule an arachni scan using an arachni REST server.')
-parser.add_argument('--hostname', type=str, nargs=1, help='hostname of the arachni REST server (default: localhost)')
-parser.add_argument('--port', type=int, nargs=1, help='port of the arachni REST server (default: localhost)')
-parser.add_argument('--username', type=str, nargs=1, help='username to authenticate to the REST server with')
-parser.add_argument('--password', type=str, nargs=1, help='password to authenticate to the REST server with')
 parser.add_argument('--url', type=str, nargs=1, help='URL to scan')
-parser.add_argument('--delete', type=str, nargs=1, help='delete/abandon a scan on the arachni REST server')
-parser.add_argument('--report', type=str, nargs=1, help='download report from the arachni REST server')
-parser.add_argument('--format', type=str, nargs=1, help='downloaded report format')
-parser.add_argument('--list', action='store_true', help='list scan ids from the arachni REST server')
-parser.add_argument('--status', type=str, nargs=1, help='get status of scan from the arachni REST server')
-parser.add_argument('--pause', type=str, nargs=1, help='pause scan running on the arachni REST server')
+parser.add_argument('--hostname', type=str, nargs='?', help='hostname of the arachni REST server (default: localhost)')
+parser.add_argument('--port', type=int, nargs='?', help='port the arachni REST server listens on (default: 7331)')
+parser.add_argument('--delete', type=str, nargs='?', help='delete/abandon a scan on the arachni REST server')
+parser.add_argument('--report', type=str, nargs='?', help='download report from the arachni REST server')
+parser.add_argument('--format', type=str, nargs='?', help='downloaded report format')
+parser.add_argument('--fetch', type=str, nargs='?', help='fetch scan ids from the arachni REST server')
+parser.add_argument('--status', type=str, nargs='?', help='get status of scan from the arachni REST server')
+parser.add_argument('--pause', type=str, nargs='?', help='pause scan running on the arachni REST server')
+parser.add_argument('--resume', type=str, nargs='?', help='resume scan running on the arachni REST server')
+parser.add_argument('--cookies', type=str, nargs='?', help='cookies to include with the scan')
+parser.add_argument('--optionsfile', type=str, nargs='?', help='file locaiton representing the scan options to be used')
 
 args = parser.parse_args()
 
 client = Client()
-if args.hostname:
-    client.hostname = args.hostname[0]
-if args.port:
-    client.port = args.port[0]
-if args.username:
-    client.username = args.username[0]
-if args.password:
-    client.password = args.password[0]
-
-if args.url:
-    url = args.url[0]
-    scan = Scan(client=client, scanOptions=
-    {
-        "url" : url,
-        "audit": {
-            'elements': ['link', 'form']
-        },
-        "checks" : ['active/*']
-        }
-    )
-    scan.startScan()
-    print("Scan started, new scan id: {0}".format(scan.id))
+if args.hostname and args.port:
+    client = Client(hostname=args.hostname, port=args.port)
+elif args.hostname:
+    client = Client(hostname=args.hostname)
+elif args.port:
+    client = Client(port=args.port)
 
 if args.report:
-    print (args.report[0])
-    scan = Scan(client=client, _id=args.report[0])
+    scan = Scan(client=client, _id=args.report)
     if args.format:
-        print ("Downloading report with format: {0}".format(args.format[0]))
-    scan.downloadReport(_format=args.format[0])
+        print ("trying format: {0}".format(args.format))
+    scan.downloadReport(_format=args.format)
 
-if args.list:
-    print ("Listing scans...")
+if args.url or args.optionsfile:
+    scanOptions = {}
+    if args.optionsfile:
+        print("Loading json...")
+        with open(args.optionsfile, 'r') as f:
+            scanOptions = json.loads(f.read())
+            
+    if args.url:
+        url = args.url[0]
+        scanOptions.update({"url": url})
+
+    scan = Scan(client=client, scanOptions=scanOptions)
+    scan.startScan()
+    print("New scan id: {0}".format(scan.id))
+
+if args.fetch:
+    print ("Fetching...")
     scans = client.getScans()
-    for scan in scans:
-        scan.display()
+    for s in scans:
+        print("{0} : {1}".format(s.id, s.scan['status']))
+
+if args.status:
+    print("Grabbing scan status...")
+    print(client.getScan(args.status))
 
 if args.delete:
-    scan = Scan(client=client, _id=args.delete[0])
-    scan.deleteScan()
-if args.status:
-    scan = Scan(client=client, _id=args.status[0])
-    scan.updateScan()
-    scan.display()
+    print("Deleting scan {}...".format(args.delete))
+    client.deleteScan(args.delete)
+
 if args.pause:
-    scan = Scan(client=client, _id=args.pause[0])
-    scan.pauseScan()
+    print("Pausing scan {}...".format(args.pause))
+    client.pauseScan(args.pause)
+
+if args.resume:
+    print("Resuming scan {}...".format(args.resume))
+    client.resumeScan(args.resume)

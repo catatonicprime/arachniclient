@@ -12,10 +12,7 @@ class Scan:
         self.scan = scan
 
     def display(self):
-        print ("Scan {0}:".format(self.id))
-        print ("\tStatus: {0}".format(self.scan['status']))
-        print ("\tIssues: {0}".format(self.scan['issues']))
-        print ("\tCurrent Page: {0}".format(self.scan['statistics']['current_page']))
+        print ("{0} : {1}".format(self.id, self.scan['status']))
 
     def updateScan(self):
         if self.client is None:
