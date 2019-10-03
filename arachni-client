@@ -11,7 +11,7 @@ parser.add_argument('--port', type=int, nargs='?', help='port the arachni REST s
 parser.add_argument('--delete', type=str, nargs='?', help='delete/abandon a scan on the arachni REST server')
 parser.add_argument('--report', type=str, nargs='?', help='download report from the arachni REST server')
 parser.add_argument('--format', type=str, nargs='?', help='downloaded report format')
-parser.add_argument('--fetch', type=str, nargs='?', help='fetch scan ids from the arachni REST server')
+parser.add_argument('--fetch', action="store_true", help='fetch scan ids from the arachni REST server')
 parser.add_argument('--status', type=str, nargs='?', help='get status of scan from the arachni REST server')
 parser.add_argument('--pause', type=str, nargs='?', help='pause scan running on the arachni REST server')
 parser.add_argument('--resume', type=str, nargs='?', help='resume scan running on the arachni REST server')
