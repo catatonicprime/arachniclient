@@ -6,7 +6,7 @@ from arachniclient import *
 
 parser = argparse.ArgumentParser(description='Schedule an arachni scan using an arachni REST server.')
 parser.add_argument('--url', type=str, nargs=1, help='URL to scan')
-parser.add_argument('--hostname', type=str, nargs='?', help='hostname of the arachni REST server (default: localhost)')
+parser.add_argument('--hostname', type=str, nargs='?', help='hostname of the arachni REST server (default: 127.0.0.1)')
 parser.add_argument('--port', type=int, nargs='?', help='port the arachni REST server listens on (default: 7331)')
 parser.add_argument('--delete', type=str, nargs='?', help='delete/abandon a scan on the arachni REST server')
 parser.add_argument('--report', type=str, nargs='?', help='download report from the arachni REST server')

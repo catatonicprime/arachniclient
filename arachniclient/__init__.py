@@ -77,7 +77,7 @@ class Scan:
 
 
 class Client:
-    def __init__(self, hostname='localhost', port='7331', username=None, password=None):
+    def __init__(self, hostname='127.0.0.1', port='7331', username=None, password=None):
         if hostname is None:
             raise Exception('hostname cannot be None')
         if port is None:
