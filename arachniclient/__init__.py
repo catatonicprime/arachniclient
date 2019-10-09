@@ -1,7 +1,6 @@
 import requests
 from requests.auth import HTTPBasicAuth
 from io import StringIO
-import time
 
 
 class Scan:
@@ -10,9 +9,27 @@ class Scan:
         self.scanOptions = scanOptions
         self.client = client
         self.scan = scan
+        self.startTime = None
 
     def display(self):
-        print ("{0} : {1}".format(self.id, self.scan['status']))
+        print ("{0} : {1}".format(self.id, self.status))
+
+    @property
+    def status(self):
+        if self.scan is None:
+            return None
+        return self.scan['status']
+
+    @property
+    def url(self):
+        return self.scanOptions['url']
+    
+    @property
+    def runtime(self):
+        try:
+            return self.scan['statistics']['runtime']
+        except:
+            return None
 
     def updateScan(self):
         if self.client is None:
