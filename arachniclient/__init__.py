@@ -73,7 +73,7 @@ class Scan:
         self.client.deleteScan(self.id)
         self.id = None
 
-    def downloadReport(self, _format=None, dest=None):
+    def downloadReport(self, fmt=None, dest=None):
         if self.client is None:
             raise Exception("client cannot be None")
         if self.id is None:
@@ -84,11 +84,11 @@ class Scan:
                       'html.zip': '.html.zip'}
         # Default to '.json' extension.
         extension = extensions['json']
-        fmt = str(_format)
+        fmt = str(fmt)
         print('fmt: {0}'.format(fmt))
         if fmt in extensions:
             extension = extensions[fmt]
-        report_data = self.client.getReport(self.id, _format)
+        report_data = self.client.getReport(self.id, fmt)
         with open("{0}{1}".format(self.id, extension), "wb") as handle:
             handle.write(report_data)
 
@@ -154,9 +154,9 @@ class Client:
         if not r.status_code == 200:
             raise Exception('Failed to delete scan with id {0}'.format(_id))
 
-    def getReport(self, _id, _format=None):
+    def getReport(self, _id, fmt=None):
         url = self.getUrl('scans/{0}/report'.format(_id))
-        if _format in ['json', 'xml', 'yaml', 'html.zip']:
+        if fmt in ['json', 'xml', 'yaml', 'html.zip']:
             url = "{0}.{1}".format(url, 'html.zip')
         r = self._session.get(url)
         if not r.status_code == 200:

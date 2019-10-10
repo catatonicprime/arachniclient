@@ -32,7 +32,7 @@ if args.report:
     scan = Scan(client=client, _id=args.report)
     if args.format:
         print ("trying format: {0}".format(args.format))
-    scan.downloadReport(_format=args.format)
+    scan.downloadReport(fmt=args.format)
 
 if args.url or args.optionsfile:
     scanOptions = {}
