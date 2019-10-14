@@ -21,7 +21,7 @@ arachni-client --url "https://[target server]/"
 Listing currently running scans:
 
 ```sh
-arachni-client --list
+arachni-client --fetch
 ```
 
 Fetching a report from a running or completed scan in a zipped HTML format:
