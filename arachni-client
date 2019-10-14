@@ -2,7 +2,8 @@
 
 import argparse
 import json
-from arachniclient import *
+from arachniclient import Client
+from arachniclient import Scan
 
 parser = argparse.ArgumentParser(description='Schedule an arachni scan using an arachni REST server.')
 parser.add_argument('--url', type=str, nargs=1, help='URL to scan')
@@ -20,6 +21,7 @@ parser.add_argument('--optionsfile', type=str, nargs='?', help='file locaiton re
 
 args = parser.parse_args()
 
+# Build out the client to use.
 client = Client()
 if args.hostname and args.port:
     client = Client(hostname=args.hostname, port=args.port)
@@ -28,8 +30,9 @@ elif args.hostname:
 elif args.port:
     client = Client(port=args.port)
 
+# Process the CLI requests
 if args.report:
-    scan = Scan(client=client, _id=args.report)
+    scan = Scan(client=client, scanId=args.report)
     if args.format:
         print ("trying format: {0}".format(args.format))
     scan.downloadReport(fmt=args.format)
