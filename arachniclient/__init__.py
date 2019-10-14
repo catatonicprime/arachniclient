@@ -86,7 +86,6 @@ class Scan:
         # Default to '.json' extension.
         extension = extensions['json']
         fmt = str(fmt)
-        print('fmt: {0}'.format(fmt))
         if fmt in extensions:
             extension = extensions[fmt]
         report_data = self.client.getReport(self.id, fmt)
@@ -158,7 +157,7 @@ class Client:
     def getReport(self, scanId, fmt=None):
         url = self.getUrl('scans/{0}/report'.format(scanId))
         if fmt in ['json', 'xml', 'yaml', 'html.zip']:
-            url = "{0}.{1}".format(url, 'html.zip')
+            url = "{0}.{1}".format(url, fmt)
         r = self._session.get(url)
         if r.status_code == 200:
             return r.content
