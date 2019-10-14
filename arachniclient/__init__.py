@@ -23,13 +23,13 @@ class Scan:
     @property
     def url(self):
         return self.scanOptions['url']
-    
+
     @property
     def runtime(self):
         self.updateScan()
         try:
             return self.scan['statistics']['runtime']
-        except:
+        except ValueError:
             return None
 
     def updateScan(self):
@@ -125,7 +125,7 @@ class Client:
             raise Exception('An error occurred: \r\n{0}'.format(r.content))
         try:
             scan_id = r.json()['id']
-        except:
+        except ValueError:
             raise Exception('An error occurred retreiving scan id from json: {0}'.format(r.content))
         return scan_id
 
@@ -134,7 +134,6 @@ class Client:
         if r.status_code == 200:
             return r.json()
         raise Exception('An error occurred: \r\n{0}'.format(r.content))
-        
 
     def pauseScan(self, scanId):
         r = self._session.put(self.getUrl('scans/{0}/pause'.format(scanId)))
